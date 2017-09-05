@@ -1,0 +1,33 @@
+.col-lg-12
+{
+    margin: 25px;
+    /*
+    border: groove;
+    border-color: #e3f3ff;
+    border-radius: 10%;
+    */
+}
+
+.col-lg-12 .message-header
+{
+    margin-top: 15px;
+}
+
+.col-lg-12 .message-body
+{
+    position: relative;
+    text-align: center;
+    margin: 10px;
+}
+
+.col-lg-12 .message-author
+{
+    margin-top: 10px;
+}
+
+.button-group-2
+{
+    position: relative;
+    left: 10%;
+}
+
