@@ -1,4 +1,4 @@
-.col-lg-12
+.col-md-12
 {
     margin: 25px;
     /*
@@ -8,19 +8,19 @@
     */
 }
 
-.col-lg-12 .message-header
+.col-md-12 .message-header
 {
     margin-top: 15px;
 }
 
-.col-lg-12 .message-body
+.col-md-12 .message-body
 {
     position: relative;
     text-align: center;
     margin: 10px;
 }
 
-.col-lg-12 .message-author
+.col-md-12 .message-author
 {
     margin-top: 10px;
 }

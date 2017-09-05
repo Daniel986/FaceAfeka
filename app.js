@@ -11,7 +11,11 @@ var index = require('./routes/index');
 
 var app = express();
 
-mongoose.connect('localhost:27017/posts');
+// var promise = mongoose.connect('mongodb://localhost', {
+//     useMongoClient: true,
+//     /* other options */
+// });
+mongoose.connect('mongodb://localhost:27017/all_posts', {useMongoClient: true});
 
 
 // view engine setup
