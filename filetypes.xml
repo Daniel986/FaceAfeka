@@ -2,6 +2,7 @@
   <component name="FileTypeManager" version="17">
     <extensionMap>
       <mapping pattern="login-seeder" type="JavaScript" />
+      <mapping pattern="post-seeder" type="JavaScript" />
       <mapping pattern="login-seeder.js" type="PLAIN_TEXT" />
     </extensionMap>
   </component>
