@@ -6,7 +6,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var expressHbs = require('express-handlebars');
 var mongoose = require('mongoose');
-
+var session = require('express-session');
+var Promise = require('bluebird');
 var index = require('./routes/index');
 
 var app = express();
@@ -15,8 +16,28 @@ var app = express();
 //     useMongoClient: true,
 //     /* other options */
 // });
-mongoose.connect('mongodb://localhost:27017/all_posts', {useMongoClient: true});
+mongoose.connect('mongodb://localhost:27017/', {useMongoClient: true});
 
+// cookie management
+app.use(session({
+    secret: '2C44774A-D649-4D44-9535-46E296EF984F',
+    resave: false,
+    saveUninitialized: false}));
+//authentication middleware
+app.use(function (req, res, next) {
+    if (req.session && req.session.admin) {
+        res.locals.admin = true;
+    }
+    next();
+});
+//authorization middleware
+var authorize = function (req, res, next) {
+    if (req.session && req.session.admin) {
+        return next();
+    } else {
+        return res.sendStatus(401);
+    }
+};
 
 // view engine setup
 app.engine('.hbs', expressHbs({defaultLayout:'layout',
