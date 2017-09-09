@@ -3,28 +3,59 @@
 /**
  * Module dependencies.
  */
+var express = require('express');
+var fs = require('fs');
 var app = require('../app');
 var debug = require('debug')('faceafeka:server');
 var http = require('http');
-
-/**
- * Get port from environment and store in Express.
- */
-
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+var https = require('https');
+var privateKey  = fs.readFileSync('sslcert/38956704-localhost_8443.key', 'utf8');
+var certificate = fs.readFileSync('sslcert/38956704-localhost_8443.cert', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
+// /**
+//  * Get port from environment and store in Express.
+//  */
+//
+// var port = normalizePort(process.env.PORT || '8443');
+// app.set('port', port);
+//
+
+port = 8443;
+httpsServer.listen(port);
+console.log("HTTPS listening on 8443");
+
+
 /**
  * Listen on provided port, on all network interfaces.
  */
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+httpsServer.on('error', onError);
+httpsServer.on('listening', onListening);
+
+/**
+ * Redirect http to https
+ */
+
+var redirectApp = express() ,
+    redirectServer = http.createServer(redirectApp);
+
+redirectApp.use(function requireHTTPS(req, res, next) {
+    if (!req.secure) {
+        secureUrl = 'https://' + req.headers.host + req.url;
+        return res.redirect(secureUrl.replace('080', '443'));
+    }
+    next();
+});
+
+redirectServer.listen(8080);
+console.log("HTTP redirect listening on 8080");
 
 /**
  * Normalize a port into a number, string, or false.
@@ -79,7 +110,7 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
+  var addr = httpsServer.address();
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
