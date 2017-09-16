@@ -14,6 +14,7 @@ var userSchema = new mongoose.Schema({
   thumbnail: String,
   avatar: { type: String, default: 'img/avatar.png'}
 });
+
 /*
 userSchema.pre('save', function (next) {
   if (!this.isModified('password')) return next();

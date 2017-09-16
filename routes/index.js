@@ -75,4 +75,46 @@ router.post('/signup', function(req, res, next) {
     });
 });
 
+router.get('/users', function(req, res) {
+    if (Object.keys(req.query).length === 0) {
+        User.find(
+            {},
+            function (err, docs) {
+                var usernames = [];
+                if (docs) {
+                    docs.forEach(function (doc) {
+                        usernames.push(doc.username);
+                    });
+                    return usernames;
+                }
+            });
+    }
+    else if (req.query['term'] == "*") {
+        User.find(
+            {},
+            function (err, docs) {
+                var usernames = [];
+                if (docs) {
+                    docs.forEach(function (doc) {
+                        usernames.push(doc.username);
+                    });
+                    res.send(usernames);
+                }
+            });
+    }
+    else {
+        User.find(
+            {"username": {"$regex": req.query['term'], "$options": "i"}},
+            function (err, docs) {
+                var usernames = [];
+                if (docs) {
+                    docs.forEach(function (doc) {
+                        usernames.push(doc.username);
+                    });
+                    res.send(usernames);
+                }
+            });
+    }
+});
+
 module.exports = router;
