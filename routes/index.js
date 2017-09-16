@@ -6,7 +6,15 @@ var Promise = require('bluebird');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'FaceAfeka' });
+    if (req.session.user==null) res.render('index', { title: 'FaceAfeka', user: req.session.user, posts: {} });
+    else {
+        res.render('index', { title: 'FaceAfeka', user: req.session.user, posts: {} });
+    }
+});
+
+router.get('/logout', function(req, res, next) {
+    req.session.destroy();
+    res.redirect('/');
 });
 
 router.get('/login', function(req, res, next) {
