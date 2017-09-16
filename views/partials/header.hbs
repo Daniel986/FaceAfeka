@@ -38,9 +38,13 @@
                 {{/if}}
             </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
+        {{#if friendsError}}
+            {{friendsError}}
+        {{/if}}
+        <br>
+        <form class="form-inline my-2 my-lg-0" action="/add_friend" method="post">
             <div id="remote">
-                <input class="typeahead" type="text" placeholder="Type friend's name">
+                <input class="typeahead" name='friend_name' type="text" placeholder="Type friend's name">
             </div>
 
             <script>
