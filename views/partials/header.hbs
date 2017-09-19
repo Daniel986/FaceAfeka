@@ -38,9 +38,31 @@
                 {{/if}}
             </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        {{#if friendsError}}
+            {{friendsError}}
+        {{/if}}
+        <br>
+        <form class="form-inline my-2 my-lg-0" action="/add_friend" method="post">
+            <div id="remote">
+                <input class="typeahead" name='friend_name' type="text" placeholder="Type friend's name">
+            </div>
+
+            <script>
+                var users = new Bloodhound({
+                    datumTokenizer: Bloodhound.tokenizers.whitespace,
+                    queryTokenizer: Bloodhound.tokenizers.whitespace,
+                    remote: {
+                        url: 'users?term=%QUERY',
+                        wildcard: '%QUERY'
+                    }
+                });
+
+                $('#remote .typeahead').typeahead(null, {
+                    name: 'users',
+                    source: users
+                });
+            </script>
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Add Friend</button>
         </form>
     </div>
 </nav>
