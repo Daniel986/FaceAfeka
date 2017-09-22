@@ -2,7 +2,7 @@ var Post = require('../models/post');
 var mongoose = require('mongoose');
 console.log('../models/post');
 
-mongoose.connect('mongodb://localhost:27017/all_posts', {useMongoClient: true});
+mongoose.connect('mongodb://localhost:27017/faceafeka', {useMongoClient: true});
 
 var posts = [
     new Post({
