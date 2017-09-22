@@ -15,7 +15,6 @@ var userSchema = new mongoose.Schema({
   avatar: { type: String, default: 'img/avatar.png'}
 });
 
-/*
 userSchema.pre('save', function (next) {
   if (!this.isModified('password')) return next();
   bcrypt.genSalt(10, function (err, salt) {
@@ -26,5 +25,5 @@ userSchema.pre('save', function (next) {
     });
   });
 });
-*/
+
 module.exports = mongoose.model('User', userSchema);

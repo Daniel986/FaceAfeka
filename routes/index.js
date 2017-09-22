@@ -119,7 +119,7 @@ router.get('/users', function(req, res) {
 
 router.post('/add_friend', function(req, res, next) {
     if (req.session.user==null) {
-        console.log('user not logged in')
+        console.log('user not logged in');
         res.render('index', {
             friendsError: 'Must be logged in to add friends',
             title: 'FaceAfeka',
@@ -128,35 +128,49 @@ router.post('/add_friend', function(req, res, next) {
         });
     }
     else {
-        User.findOne({username: req.session.user.username}, function(err, currentUser) {
-            if (currentUser.friends.includes(req.body.friend_name)) {
+        User.findOne({username: req.body.friend_name}, function(err, result) {
+            if (!result) {
                 res.render('index', {
-                    friendsError: 'You are already friends',
-                    title: 'FaceAfeka',
-                    user: req.session.user,
-                    posts: {}
-                });
-            }
-            else if (currentUser.username == req.body.friend_name) {
-                res.render('index', {
-                    friendsError: 'Cannot add self as friend',
+                    friendsError: 'Not a registered user',
                     title: 'FaceAfeka',
                     user: req.session.user,
                     posts: {}
                 });
             }
             else {
-                console.log('user ' + req.session.user.username + ' adding friend ' + req.body.friend_name);
-                currentUser.friends.push(req.body.friend_name);
-                currentUser.save();
-                res.redirect('/');
-                console.log('adding the other way around');
-                User.findOne({username: req.body.friend_name}, function(err, otherUser) {
-                    otherUser.friends.push(currentUser.username);
-                    otherUser.save();
+                User.findOne({username: req.session.user.username}, function(err, currentUser) {
+                    if (currentUser.friends.includes(req.body.friend_name)) {
+                        res.render('index', {
+                            friendsError: 'You are already friends',
+                            title: 'FaceAfeka',
+                            user: req.session.user,
+                            posts: {}
+                        });
+                    }
+                    else if (currentUser.username == req.body.friend_name) {
+                        res.render('index', {
+                            friendsError: 'Cannot add self as friend',
+                            title: 'FaceAfeka',
+                            user: req.session.user,
+                            posts: {}
+                        });
+                    }
+                    else {
+                        console.log('user ' + req.session.user.username + ' adding friend ' + req.body.friend_name);
+                        currentUser.friends.push(req.body.friend_name);
+                        currentUser.save();
+                        res.redirect('/');
+                        console.log('adding the other way around');
+                        User.findOne({username: req.body.friend_name}, function(err, otherUser) {
+                            otherUser.friends.push(currentUser.username);
+                            otherUser.save();
+                        });
+                    }
                 });
             }
         });
+
+
     }
 });
 

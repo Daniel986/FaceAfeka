@@ -16,7 +16,7 @@ var app = express();
 //     useMongoClient: true,
 //     /* other options */
 // });
-mongoose.connect('mongodb://localhost:27017/', {useMongoClient: true});
+mongoose.connect('mongodb://localhost:27017/faceafeka', {useMongoClient: true});
 
 // cookie management
 app.use(session({
