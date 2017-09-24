@@ -9,7 +9,6 @@ var mongoose = require('mongoose');
 var session = require('express-session');
 var Promise = require('bluebird');
 var index = require('./routes/index');
-
 var app = express();
 
 // var promise = mongoose.connect('mongodb://localhost', {
@@ -38,7 +37,6 @@ var authorize = function (req, res, next) {
         return res.sendStatus(401);
     }
 };
-
 // view engine setup
 app.engine('.hbs', expressHbs({defaultLayout:'layout',
     extname:'.hbs',
@@ -46,8 +44,7 @@ app.engine('.hbs', expressHbs({defaultLayout:'layout',
     partialsDir:__dirname +'/views/partials'}));
 app.set('view engine', '.hbs');
 app.set('views', __dirname + '/views');
-
-// uncomment after placing your favicon in /public
+// favicon in /public
 app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());

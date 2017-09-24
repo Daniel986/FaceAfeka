@@ -3,14 +3,78 @@ var router = express.Router();
 var User = require('../models/user');
 var bcrypt = require('bcrypt');
 var Promise = require('bluebird');
+var Post = require('../models/post');
+var multiparty = require('multiparty');
+var format = require('util').format;
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    if (req.session.user==null) res.render('index', { title: 'FaceAfeka', user: req.session.user, posts: {} });
+    if (req.session.user==null){
+        Post.find({private : false})
+            .populate({path:'author', select:'-_id username'})
+            .sort({created: 'desc'})
+            .exec(function(err, posts) {
+            return res.render('index', {title: 'FaceAfeka', user: req.session.user,
+                posts: posts, logged: false, error: '', privateCheck: true});
+        });
+    }
     else {
-        res.render('index', { title: 'FaceAfeka', user: req.session.user, posts: {} });
+        Post.find({$or: [{$and: [{private : true}, {authorName: { $eq: req.session.user.username }}]}, {private : false}]})
+            .populate({path:'author', select:'-_id username'})
+            .sort({created: 'desc'})
+            .exec(function(err, posts) {
+            // var currUser = req.session.user.username;
+            // var privateVal;
+            // var postUser;
+            // var postsRes = posts.map(function (refined){
+            //     postUser = refined.authorName;
+            //     privateVal = refined.private.valueOf();
+            //     if(privateVal && currUser !== postUser) {
+            //         console.log(refined);
+            //         delete posts[refined];
+            //     }
+            //     return refined;
+            // });
+            return res.render('index', {title: 'FaceAfeka', user: req.session.user,
+                posts: posts, logged: true, error: '', privateCheck: true});
+        });
     }
 });
+/* POST home page. */
+router.post('/', function(req, res, next) {
+    if(!req.body.bodyHolder || !req.body.titleHolder) {
+        Post.find({$or: [{$and: [{private : true}, {authorName: { $eq: req.session.user.username }}]}, {private : false}]},
+            function(err, posts){
+            return res.render('index', {title: 'FaceAfeka', user: req.session.user, posts: posts,
+                logged: true, error: 'Gonna need you to fill up them text areas before you post..', privateCheck: true});
+        }).sort({created: 'desc'});
+    }
+    else {
+        new Post({
+            header: req.body.titleHolder,
+            author: req.session.user,
+            authorName: req.session.user.username,
+            body: req.body.bodyHolder,
+            comments: [],
+            likes: [],
+            private: req.body.privateCheck
+        }).save(function(err, result) {
+            // console.log(req.session.user);
+            if(req.session.user != null)
+                Post.find({$or: [{$and: [{private : true}, {authorName: { $eq: req.session.user.username }}]}, {private : false}]})
+                    .populate('author', '-_id username')
+                    .sort({created: 'desc'})
+                    .exec(function(err, posts) {
+                    return res.render('index', {title: 'FaceAfeka', user: req.session.user, posts: posts,
+                        logged: true, error: 'Post published', privateCheck: true});
+                });
+        });
+
+    }
+
+});
+
 
 router.get('/logout', function(req, res, next) {
     req.session.destroy();
@@ -175,3 +239,8 @@ router.post('/add_friend', function(req, res, next) {
 });
 
 module.exports = router;
+
+
+function newPost(){
+
+}

@@ -7,24 +7,27 @@ mongoose.connect('mongodb://localhost:27017/faceafeka', {useMongoClient: true});
 var posts = [
     new Post({
         header: 'Post#1',
-        author: 'Baruch Shekelberg',
+        author: '59c54054428e6819743493b9',
         body: 'ma kore',
         comments: [],
-        likes: []
+        likes: [],
+        private: false
     }),
     new Post({
         header: 'Post#2',
-        author: 'Yaron Shekelstein',
+        author: '59c54054428e6819743493b9',
         body: 'ma nishma',
         comments: [],
-        likes: []
+        likes: [],
+        private: false
     }),
     new Post({
         header: 'Post#3',
         author: 'Yaacov Cohen',
         body: 'ma ha inyanim',
         comments: [],
-        likes: []
+        likes: [],
+        private: false
     })
 ];
 

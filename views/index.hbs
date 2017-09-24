@@ -1,32 +1,55 @@
-<div class="row">
-    <div class="col-md-12">
-        <div class="thumbnail">
-            <div class="caption">
-                <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> Post#1</h3>
-                <h6 class="message-author">By: Baruch Shekelberg</h6>
-                <p class="message-body">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec id commodo mauris, nec varius justo. Donec quis leo enim. Donec id nibh id nisl efficitur lacinia eu eget nulla. Donec volutpat purus tortor, non scelerisque magna fermentum vel. Phasellus ac risus pharetra odio porttitor bibendum. Morbi lacinia eleifend nunc, at semper dolor finibus ac. Sed accumsan, erat eget vulputate mattis, felis justo fermentum nunc, in dapibus mauris mi vel mi. In massa tortor, gravida vehicula volutpat sed, efficitur molestie nisi. Fusce in arcu rutrum, auctor turpis at, condimentum mi. Aenean ac neque ante.
-                </p>
-                <p class="button-group-2">
-                    <a href="#" class="btn btn-primary" role="button">Comment</a>
-                    <a href="#" class="btn btn-success" role="button">Like</a>
-                </p>
+
+{{# if logged}}
+    <form method="post" action="/">
+        <div class="form-group">
+            {{error}}
+            <input type="text" class="form-control" name="titleHolder" value="" placeholder="Title">
+            <textarea type="text" class="form-control input-lg" name="bodyHolder" value="" rows="3" placeholder="What is up today?"></textarea>
+            <button type="submit" class="btn btn-primary btn-lg" name="commit" id="submit-post">Post</button>
+            <label><input type="checkbox" id="private-check" name="privateCheck"> Private?</label>
+        </div>
+    </form>
+    {{# each posts}}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="thumbnail">
+                    <div class="caption">
+                        <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
+                        <h6 class="message-author">By: {{this.authorName}}</h6>
+                        <p class="message-body">{{this.body}}</p>
+                        <p class="button-group-2">
+                            <button class="btn btn-primary" id="comment-button">Comment</button>{{this.comments}}
+                            <button class="btn btn-success" id="like-button">Like</button>{{this.likes}}
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-12">
-        <div class="thumbnail">
-            <div class="caption">
-                <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> Post#1</h3>
-                <h6 class="message-author">By: Baruch Shekelberg</h6>
-                <p class="message-body">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec id commodo mauris, nec varius justo. Donec quis leo enim. Donec id nibh id nisl efficitur lacinia eu eget nulla. Donec volutpat purus tortor, non scelerisque magna fermentum vel. Phasellus ac risus pharetra odio porttitor bibendum. Morbi lacinia eleifend nunc, at semper dolor finibus ac. Sed accumsan, erat eget vulputate mattis, felis justo fermentum nunc, in dapibus mauris mi vel mi. In massa tortor, gravida vehicula volutpat sed, efficitur molestie nisi. Fusce in arcu rutrum, auctor turpis at, condimentum mi. Aenean ac neque ante.
-                </p>
-                <p class="button-group-2">
-                    <a href="#" class="btn btn-primary" role="button">Comment</a>
-                    <a href="#" class="btn btn-success" role="button">Like</a>
-                </p>
+    {{/each}}
+{{else}}
+    {{# each posts}}
+        <div class="row">
+            <div class="col-md-12 well-lg">
+                <div class="thumbnail">
+                    <div class="caption">
+                        <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
+                        <h6 class="message-author">By: {{this.authorName}}</h6>
+                        <p class="message-body">{{this.body}}</p>
+                    <p class="button-group-2">
+                        <a href="" class="btn btn-primary" role="button">Comment</a>{{this.comments}}
+                        <a href="" class="btn btn-success" role="button">Like</a>{{this.likes}}
+<!--                        {{# if privateCheck}}
+                            still Private?
+                            <form method="post" action="/">
+                                <div class="form-group">
+                                    <label><input type="checkbox" id="private-alter" name="privateAlter">still Private?</label>
+                                </div>
+                            </form>
+                        {{/if}}-->
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
+    {{/each}}
+{{/if}}

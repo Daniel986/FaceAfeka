@@ -1,22 +1,27 @@
 var mongoose = require('mongoose');
+var User = require('../models/user');
 var Schema = mongoose.Schema;
 
 var comment = new Schema({
-    header: {type: String, required: true},
-    author: {type: String, required: true},
+    author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+    authorName : {type: String},
     body: {type: String, required: true}
 });
 
 var like = new Schema({
-    author: {type: String, required: true}
+    author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+    authorName : {type: String}
 });
 
 var post = new Schema({
     header: {type: String, required: true},
-    author: {type: String, required: true},
+    author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+    authorName : {type: String},
     body: {type: String, required: true},
     comments: [comment],
-    likes: [like]
+    likes: [like],
+    private: {type: Boolean, ruquired: true, default: false},
+    created: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('post', post);
