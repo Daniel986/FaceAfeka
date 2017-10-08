@@ -20,7 +20,7 @@ var post = new Schema({
     body: {type: String, required: true},
     comments: [comment],
     likes: [like],
-    private: {type: Boolean, ruquired: true, default: false},
+    private: {type: Boolean, required: true, default: false},
     created: { type: Date, default: Date.now }
 });
 

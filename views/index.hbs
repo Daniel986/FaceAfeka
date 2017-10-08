@@ -1,10 +1,16 @@
 
+<!--<div id="Under-construction">-->
+    <!--<h2>changing privacy state</h2>-->
+    <!--<button type="button" onclick="makePostPublic('59da64a7078acb09807c29aa', true)">Change Privacy</button>-->
+<!--</div>-->
+
+
 {{# if logged}}
     <form method="post" action="/">
         <div class="form-group">
             {{error}}
             <input type="text" class="form-control" name="titleHolder" value="" placeholder="Title">
-            <textarea type="text" class="form-control input-lg" name="bodyHolder" value="" rows="3" placeholder="What is up today?"></textarea>
+            <textarea class="form-control input-lg" name="bodyHolder" rows="3" placeholder="What is up today?"></textarea>
             <button type="submit" class="btn btn-primary btn-lg" name="commit" id="submit-post">Post</button>
             <label><input type="checkbox" id="private-check" name="privateCheck"> Private?</label>
         </div>
@@ -14,13 +20,25 @@
             <div class="col-md-12">
                 <div class="thumbnail">
                     <div class="caption">
+                        <p class="message-id" hidden>{{this._id}}</p>
                         <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
                         <h6 class="message-author">By: {{this.authorName}}</h6>
                         <p class="message-body">{{this.body}}</p>
-                        <p class="button-group-2">
+                        <div class="button-group-2">
                             <button class="btn btn-primary" id="comment-button">Comment</button>{{this.comments}}
                             <button class="btn btn-success" id="like-button">Like</button>{{this.likes}}
-                        </p>
+                            {{# ifCond this.authorName '===' ../user.username}}
+                                {{# if this.private}}
+                                    <button type="submit" class="btn btn-warning" onclick="makePostPublic('{{this._id}}', true)">
+                                        Make Public
+                                    </button>
+                                {{else}}
+                                    <button type="submit" class="btn btn-warning" onclick="makePostPublic('{{this._id}}', false)">
+                                        Make Private
+                                    </button>
+                                {{/if}}
+                            {{/ifCond}}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -32,20 +50,13 @@
             <div class="col-md-12 well-lg">
                 <div class="thumbnail">
                     <div class="caption">
+                        <p class="message-id" hidden>{{this._id}}</p>
                         <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
                         <h6 class="message-author">By: {{this.authorName}}</h6>
                         <p class="message-body">{{this.body}}</p>
-                    <p class="button-group-2">
-                        <a href="" class="btn btn-primary" role="button">Comment</a>{{this.comments}}
-                        <a href="" class="btn btn-success" role="button">Like</a>{{this.likes}}
-<!--                        {{# if privateCheck}}
-                            still Private?
-                            <form method="post" action="/">
-                                <div class="form-group">
-                                    <label><input type="checkbox" id="private-alter" name="privateAlter">still Private?</label>
-                                </div>
-                            </form>
-                        {{/if}}-->
+                        <p class="button-group-2">
+                            <a href="" class="btn btn-primary" role="button">Comment</a>{{this.comments}}
+                            <a href="" class="btn btn-success" role="button">Like</a>{{this.likes}}
                         </p>
                     </div>
                 </div>

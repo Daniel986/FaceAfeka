@@ -10,35 +10,54 @@ var format = require('util').format;
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    if (req.session.user==null){
+    if (req.session.user==null) {
         Post.find({private : false})
             .populate({path:'author', select:'-_id username'})
             .sort({created: 'desc'})
             .exec(function(err, posts) {
-            return res.render('index', {title: 'FaceAfeka', user: req.session.user,
-                posts: posts, logged: false, error: '', privateCheck: true});
-        });
+                return res.render('index', {title: 'FaceAfeka', user: req.session.user,
+                    posts: posts, logged: false, error: ''});
+            });
     }
     else {
+        if(req.query.changePrivacyOn) {
+            console.log("Changing privacy on: " + req.query.changePrivacyOn);
+            Post.findOne({_id: req.query.changePrivacyOn}, function (err, post) {
+                if(post != null){
+                    if(post.private)
+                        post.private = false;
+                    else
+                        post.private = true;
+                    post.save();
+                    if(err) {
+                        console.log("DDNT SAVE");
+                    }
+                    else
+                        console.log("FOOKIN SAVED");
+                }
+            });
+            res.send();
+            return;
+        }
         Post.find({$or: [{$and: [{private : true}, {authorName: { $eq: req.session.user.username }}]}, {private : false}]})
             .populate({path:'author', select:'-_id username'})
             .sort({created: 'desc'})
             .exec(function(err, posts) {
-            // var currUser = req.session.user.username;
-            // var privateVal;
-            // var postUser;
-            // var postsRes = posts.map(function (refined){
-            //     postUser = refined.authorName;
-            //     privateVal = refined.private.valueOf();
-            //     if(privateVal && currUser !== postUser) {
-            //         console.log(refined);
-            //         delete posts[refined];
-            //     }
-            //     return refined;
-            // });
-            return res.render('index', {title: 'FaceAfeka', user: req.session.user,
-                posts: posts, logged: true, error: '', privateCheck: true});
-        });
+                // var currUser = req.session.user.username;
+                // var privateVal;
+                // var postUser;
+                // var postsRes = posts.map(function (refined){
+                //     postUser = refined.authorName;
+                //     privateVal = refined.private.valueOf();
+                //     if(privateVal && currUser !== postUser) {
+                //         console.log(refined);
+                //         delete posts[refined];
+                //     }
+                //     return refined;
+                // });
+                return res.render('index', {title: 'FaceAfeka', user: req.session.user,
+                    posts: posts, logged: true, error: ''});
+            });
     }
 });
 /* POST home page. */
@@ -46,9 +65,9 @@ router.post('/', function(req, res, next) {
     if(!req.body.bodyHolder || !req.body.titleHolder) {
         Post.find({$or: [{$and: [{private : true}, {authorName: { $eq: req.session.user.username }}]}, {private : false}]},
             function(err, posts){
-            return res.render('index', {title: 'FaceAfeka', user: req.session.user, posts: posts,
-                logged: true, error: 'Gonna need you to fill up them text areas before you post..', privateCheck: true});
-        }).sort({created: 'desc'});
+                return res.render('index', {title: 'FaceAfeka', user: req.session.user, posts: posts,
+                    logged: true, error: 'Gonna need you to fill up them text areas before you post..'});
+            }).sort({created: 'desc'});
     }
     else {
         new Post({
@@ -66,9 +85,14 @@ router.post('/', function(req, res, next) {
                     .populate('author', '-_id username')
                     .sort({created: 'desc'})
                     .exec(function(err, posts) {
-                    return res.render('index', {title: 'FaceAfeka', user: req.session.user, posts: posts,
-                        logged: true, error: 'Post published', privateCheck: true});
-                });
+                        console.log("SHOMER TO DB: " + result);
+                        return res.render('index', {title: 'FaceAfeka', user: req.session.user, posts: posts,
+                            logged: true, error: 'Post published'});
+                    });
+            else {
+                console.log("LO SHOMER: " + err);
+            }
+
         });
 
     }
