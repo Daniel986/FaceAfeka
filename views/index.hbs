@@ -4,14 +4,13 @@
     <!--<button type="button" onclick="makePostPublic('59da64a7078acb09807c29aa', true)">Change Privacy</button>-->
 <!--</div>-->
 
-
 {{# if logged}}
-    <form method="post" action="/">
+    <form method="post" action="/" id="post-form">
         <div class="form-group">
             {{error}}
-            <input type="text" class="form-control" name="titleHolder" value="" placeholder="Title">
-            <textarea class="form-control input-lg" name="bodyHolder" rows="3" placeholder="What is up today?"></textarea>
-            <button type="submit" class="btn btn-primary btn-lg" name="commit" id="submit-post">Post</button>
+            <input type="text" class="form-control" name="titleHolder" value="" placeholder="Title" id="title-holder">
+            <textarea class="form-control input-lg" name="bodyHolder" rows="3" placeholder="What is up today?" id="body-holder"></textarea>
+            <button class="btn btn-primary btn-lg" name="commit" id="submit-post">Post</button>
             <label><input type="checkbox" id="private-check" name="privateCheck"> Private?</label>
         </div>
     </form>
@@ -25,8 +24,8 @@
                         <h6 class="message-author">By: {{this.authorName}}</h6>
                         <p class="message-body">{{this.body}}</p>
                         <div class="button-group-2">
-                            <button class="btn btn-primary" id="comment-button">Comment</button>{{this.comments}}
-                            <button class="btn btn-success" id="like-button">Like</button>{{this.likes}}
+                            <button class="btn btn-primary" >Comment</button>{{this.comments}}
+                            <button class="btn btn-success" >Like</button>{{this.likes}}
                             {{# ifCond this.authorName '===' ../user.username}}
                                 {{# if this.private}}
                                     <button type="submit" class="btn btn-warning" onclick="makePostPublic('{{this._id}}', true)">
@@ -55,8 +54,8 @@
                         <h6 class="message-author">By: {{this.authorName}}</h6>
                         <p class="message-body">{{this.body}}</p>
                         <p class="button-group-2">
-                            <a href="" class="btn btn-primary" role="button">Comment</a>{{this.comments}}
-                            <a href="" class="btn btn-success" role="button">Like</a>{{this.likes}}
+                            <button class="btn btn-primary disabled" >Comment</button>{{this.comments}}
+                            <button class="btn btn-success disabled" >Like</button>{{this.likes}}
                         </p>
                     </div>
                 </div>

@@ -14,9 +14,10 @@ router.get('/', function(req, res, next) {
         Post.find({private : false})
             .populate({path:'author', select:'-_id username'})
             .sort({created: 'desc'})
+            .limit(5)
             .exec(function(err, posts) {
                 return res.render('index', {title: 'FaceAfeka', user: req.session.user,
-                    posts: posts, logged: false, error: ''});
+                    posts: posts, logged: false});
             });
     }
     else {
@@ -42,61 +43,32 @@ router.get('/', function(req, res, next) {
         Post.find({$or: [{$and: [{private : true}, {authorName: { $eq: req.session.user.username }}]}, {private : false}]})
             .populate({path:'author', select:'-_id username'})
             .sort({created: 'desc'})
+            .limit(5)
             .exec(function(err, posts) {
-                // var currUser = req.session.user.username;
-                // var privateVal;
-                // var postUser;
-                // var postsRes = posts.map(function (refined){
-                //     postUser = refined.authorName;
-                //     privateVal = refined.private.valueOf();
-                //     if(privateVal && currUser !== postUser) {
-                //         console.log(refined);
-                //         delete posts[refined];
-                //     }
-                //     return refined;
-                // });
                 return res.render('index', {title: 'FaceAfeka', user: req.session.user,
-                    posts: posts, logged: true, error: ''});
+                    posts: posts, logged: true});
             });
     }
 });
-/* POST home page. */
-router.post('/', function(req, res, next) {
-    if(!req.body.bodyHolder || !req.body.titleHolder) {
-        Post.find({$or: [{$and: [{private : true}, {authorName: { $eq: req.session.user.username }}]}, {private : false}]},
-            function(err, posts){
-                return res.render('index', {title: 'FaceAfeka', user: req.session.user, posts: posts,
-                    logged: true, error: 'Gonna need you to fill up them text areas before you post..'});
-            }).sort({created: 'desc'});
-    }
-    else {
+
+router.post('/newPost', function(req, res, next) {
+    var obj = {};
+    console.log('body: ' + JSON.stringify(req.body));
+    req.body.authorName = req.session.user.username;
         new Post({
-            header: req.body.titleHolder,
+            header: req.body.title,
             author: req.session.user,
             authorName: req.session.user.username,
-            body: req.body.bodyHolder,
+            body: req.body.message,
             comments: [],
             likes: [],
-            private: req.body.privateCheck
+            private: req.body.private
         }).save(function(err, result) {
-            // console.log(req.session.user);
-            if(req.session.user != null)
-                Post.find({$or: [{$and: [{private : true}, {authorName: { $eq: req.session.user.username }}]}, {private : false}]})
-                    .populate('author', '-_id username')
-                    .sort({created: 'desc'})
-                    .exec(function(err, posts) {
-                        console.log("SHOMER TO DB: " + result);
-                        return res.render('index', {title: 'FaceAfeka', user: req.session.user, posts: posts,
-                            logged: true, error: 'Post published'});
-                    });
-            else {
-                console.log("LO SHOMER: " + err);
-            }
-
+            console.log("SHOMER TO DB: " + result);
+            console.log("ID: " + result._id);
+            req.body.id = result._id;
+            res.send(req.body);
         });
-
-    }
-
 });
 
 
@@ -263,8 +235,3 @@ router.post('/add_friend', function(req, res, next) {
 });
 
 module.exports = router;
-
-
-function newPost(){
-
-}
