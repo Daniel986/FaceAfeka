@@ -51,6 +51,29 @@ router.get('/', function(req, res, next) {
     }
 });
 
+router.get('/wall', function(req, res, next) {
+    if (!req.query.username || req.session.user==null) {
+        return res.render('index');
+    }
+    else {
+        console.log('requested ' + req.query.username + '\'s wall');
+        Post.find({$and: [{authorName: { $eq: req.query.username }}]})
+            .populate({path:'author', select:'-_id username'})
+            .sort({created: 'desc'})
+            .limit(5)
+            .exec(function(err, posts) {
+                return res.render('wall', {
+                    title: req.query.username + '\'s wall',
+                    user: req.session.user,
+                    posts: posts,
+                    logged: true,
+                    wallOwner: req.query.username
+                });
+            });
+    }
+
+});
+
 router.post('/newPost', function(req, res, next) {
     var obj = {};
     console.log('body: ' + JSON.stringify(req.body));
@@ -176,6 +199,23 @@ router.get('/users', function(req, res) {
             });
     }
 });
+
+router.get('/friends', function(req, res, next) {
+    if (req.session.user==null) {
+        console.log('user not logged in');
+        res.render('friends', {
+            title: 'FaceAfeka',
+            user: req.session.user,
+            logged: false
+        });
+    }
+    else {
+        User.findOne({username: req.session.user.username}, function(err, currentUser) {
+            res.render('friends', {title: 'Your stoopid friends', friends: currentUser.friends, logged: true});
+        });
+    }
+});
+
 
 router.post('/add_friend', function(req, res, next) {
     if (req.session.user==null) {
