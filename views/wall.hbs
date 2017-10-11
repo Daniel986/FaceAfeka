@@ -1,0 +1,30 @@
+<h1>Welcome to {{wallOwner}}'s wall</h1>
+{{# each posts}}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="thumbnail">
+                <div class="caption">
+                    <p class="message-id" hidden>{{this._id}}</p>
+                    <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
+                    <h6 class="message-author">By: {{this.authorName}}</h6>
+                    <p class="message-body">{{this.body}}</p>
+                    <div class="button-group-2">
+                        <button class="btn btn-primary" >Comment</button>{{this.comments}}
+                        <button class="btn btn-success" >Like</button>{{this.likes}}
+                        {{# ifCond this.authorName '===' ../user.username}}
+                            {{# if this.private}}
+                                <button type="submit" class="btn btn-warning" onclick="makePostPublic('{{this._id}}', true)">
+                                    Make Public
+                                </button>
+                            {{else}}
+                                <button type="submit" class="btn btn-warning" onclick="makePostPublic('{{this._id}}', false)">
+                                    Make Private
+                                </button>
+                            {{/if}}
+                        {{/ifCond}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{{/each}}

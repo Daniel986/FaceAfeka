@@ -1,0 +1,11 @@
+
+
+{{# if logged}}
+    <h1>These are your awesome friends</h1>
+    {{# each friends}}
+        <li><a href="/wall?username={{this}}">{{this}}</a></li>
+    {{/each}}
+
+    {{else}}
+    you aint supposed to be here yo
+{{/if}}
