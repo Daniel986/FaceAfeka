@@ -6,7 +6,16 @@ var Promise = require('bluebird');
 var Post = require('../models/post');
 var multiparty = require('multiparty');
 var format = require('util').format;
-
+var multer = require('multer');
+var upload = multer({ storage: Storage }).array("imgUploader", 1); //Field name and max count
+var Storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        callback(null, "../public/images/");
+    },
+    filename: function (req, file, callback) {
+        callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+    }
+});
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -40,11 +49,66 @@ router.get('/', function(req, res, next) {
             res.send();
             return;
         }
+        if(req.query.toggleLikeOn) {
+            console.log("Adding like to: " + req.query.toggleLikeOn);
+            Post.findOne({_id: req.query.toggleLikeOn}, function (err, post) {
+                var checkIfLiked = false;
+                var arr = post.likes;
+                var likeToRemove;
+                //console.log("BDIKA: " + arr.length);
+                //if(arr.length)
+                for(var i = 0; i < arr.length; i++)
+                {
+                    //console.log("author: " + arr[i].author + " user: " + req.session.user._id);
+                    if(arr[i].author == req.session.user._id)
+                    {
+                        checkIfLiked = true;
+                        likeToRemove = i;
+                        console.log("checkIfLiked: " + checkIfLiked + ",i: " + likeToRemove);
+                        break;
+                    }
+                }
+                if(checkIfLiked){
+                    console.log("Found IT!");
+                    post.likes.splice(likeToRemove, 1);
+                    //console.log(JSON.stringify(post));
+                }
+                else{
+                    console.log("FLOCKING NEW LIKE!");
+                    post.likes.push({author: req.session.user, authorName: req.session.user.username});
+                    //console.log(JSON.stringify(post));
+                }
+                post.save();
+                if(err) {
+                    console.log("DDNT SAVE");
+                }
+                else
+                    console.log("FOOKIN SAVED");
+            });
+            res.send();
+            return;
+        }
         Post.find({$or: [{$and: [{private : true}, {authorName: { $eq: req.session.user.username }}]}, {private : false}]})
             .populate({path:'author', select:'-_id username'})
             .sort({created: 'desc'})
             .limit(5)
             .exec(function(err, posts) {
+                for(var i = 0; i < posts.length; i++)
+                {
+
+                    if(posts[i].likes) {
+                        console.log("numOfLikes: " + posts[i].likes.length);
+                        for (var j = 0; j < posts[i].likes.length; j++) {
+                            //console.log("author: " + posts[i].likes[j].author + " user: " + req.session.user._id);
+                            if (posts[i].likes[j].author == req.session.user._id) {
+                                //console.log("Found it");
+                                posts[i].liked = true;
+                                break;
+                            }
+                        }
+                    }
+                    console.log(JSON.stringify(posts[i]));
+                }
                 return res.render('index', {title: 'FaceAfeka', user: req.session.user,
                     posts: posts, logged: true});
             });
@@ -77,23 +141,28 @@ router.get('/wall', function(req, res, next) {
 router.post('/newPost', function(req, res, next) {
     var obj = {};
     console.log('body: ' + JSON.stringify(req.body));
+    upload(req, res, function (err) {
+        if (err) {
+            console.log("Something went wrong!");
+        }
+        console.log("File uploaded sucessfully!.");
+    });
     req.body.authorName = req.session.user.username;
-        new Post({
-            header: req.body.title,
-            author: req.session.user,
-            authorName: req.session.user.username,
-            body: req.body.message,
-            comments: [],
-            likes: [],
-            private: req.body.private
-        }).save(function(err, result) {
-            console.log("SHOMER TO DB: " + result);
-            console.log("ID: " + result._id);
-            req.body.id = result._id;
-            res.send(req.body);
-        });
+    new Post({
+        header: req.body.title,
+        author: req.session.user,
+        authorName: req.session.user.username,
+        body: req.body.message,
+        comments: [],
+        likes: [],
+        private: req.body.private
+    }).save(function(err, result) {
+        console.log("SHOMER TO DB: " + result);
+        console.log("ID: " + result._id);
+        req.body.id = result._id;
+        res.send(req.body);
+    });
 });
-
 
 router.get('/logout', function(req, res, next) {
     req.session.destroy();
@@ -215,7 +284,6 @@ router.get('/friends', function(req, res, next) {
         });
     }
 });
-
 
 router.post('/add_friend', function(req, res, next) {
     if (req.session.user==null) {

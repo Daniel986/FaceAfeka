@@ -1,15 +1,21 @@
 
 <!--<div id="Under-construction">-->
-    <!--<h2>changing privacy state</h2>-->
-    <!--<button type="button" onclick="makePostPublic('59da64a7078acb09807c29aa', true)">Change Privacy</button>-->
+<!--<h2>changing privacy state</h2>-->
+<!--<button type="button" onclick="makePostPublic('59da64a7078acb09807c29aa', true)">Change Privacy</button>-->
 <!--</div>-->
 
+<!--<form id="frmUploader" enctype="multipart/form-data" action="Upload/" method="post">-->
+    <!--<input type="file" name="imgUploader" multiple />-->
+    <!--<input type="submit" name="submit" id="btnSubmit" value="Upload" />-->
+<!--</form>-->
+
 {{# if logged}}
-    <form method="post" action="/" id="post-form">
+    <form method="post" action="/" id="post-form" enctype="multipart/form-data">
         <div class="form-group">
             {{error}}
             <input type="text" class="form-control" name="titleHolder" value="" placeholder="Title" id="title-holder">
             <textarea class="form-control input-lg" name="bodyHolder" rows="3" placeholder="What is up today?" id="body-holder"></textarea>
+            <input type="file" name="imgUploader" multiple /><br>
             <button class="btn btn-primary btn-lg" name="commit" id="submit-post">Post</button>
             <label><input type="checkbox" id="private-check" name="privateCheck"> Private?</label>
         </div>
@@ -24,15 +30,23 @@
                         <h6 class="message-author">By: {{this.authorName}}</h6>
                         <p class="message-body">{{this.body}}</p>
                         <div class="button-group-2">
-                            <button class="btn btn-primary" >Comment</button>{{this.comments}}
-                            <button class="btn btn-success" >Like</button>{{this.likes}}
+                            <button class="btn btn-primary" >Comment ({{this.comments.length}})</button>{{this.comments}}
+                            {{# if this.liked}}
+                                <button class="btn btn-success" onclick="toggleLike('{{this._id}}', false)">
+                                    Unlike ({{this.likes.length}})
+                                </button>
+                            {{else}}
+                                <button class="btn btn-success" onclick="toggleLike('{{this._id}}', true)">
+                                    Like ({{this.likes.length}})
+                                </button>
+                            {{/if}}
                             {{# ifCond this.authorName '===' ../user.username}}
                                 {{# if this.private}}
-                                    <button type="submit" class="btn btn-warning" onclick="makePostPublic('{{this._id}}', true)">
+                                    <button class="btn btn-warning" onclick="makePostPublic('{{this._id}}', true)">
                                         Make Public
                                     </button>
                                 {{else}}
-                                    <button type="submit" class="btn btn-warning" onclick="makePostPublic('{{this._id}}', false)">
+                                    <button class="btn btn-warning" onclick="makePostPublic('{{this._id}}', false)">
                                         Make Private
                                     </button>
                                 {{/if}}
@@ -46,20 +60,32 @@
 {{else}}
     {{# each posts}}
         <div class="row">
-            <div class="col-md-12 well-lg">
-                <div class="thumbnail">
-                    <div class="caption">
-                        <p class="message-id" hidden>{{this._id}}</p>
-                        <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
-                        <h6 class="message-author">By: {{this.authorName}}</h6>
-                        <p class="message-body">{{this.body}}</p>
-                        <p class="button-group-2">
-                            <button class="btn btn-primary disabled" >Comment</button>{{this.comments}}
-                            <button class="btn btn-success disabled" >Like</button>{{this.likes}}
-                        </p>
-                    </div>
-                </div>
+        <div class="col-md-12 well-lg">
+        <div class="thumbnail">
+        <div class="caption">
+            <p class="message-id" hidden>{{this._id}}</p>
+            <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
+            <h6 class="message-author">By: {{this.authorName}}</h6>
+            <p class="message-body">{{this.body}}</p>
+        <p class="button-group-2">
+            <button class="btn btn-primary disabled" >Comment ({{this.comments.length}})</button>
+        {{# each this.comments}}
+                <div class="row">
+                    <div class="col-md-6 well-lg">
+                        <div class="thumbnail">
+                            <div class="caption">
+                                <h6 class="comment-author">By: {{this.authorName}}</h6>
+                <p class="comment-body">{{this.body}} </p>
             </div>
+            </div>
+            </div>
+            </div>
+        {{/each}}
+        <button class="btn btn-success disabled">Like ({{this.likes.length}})</button>
+        </p>
+        </div>
+        </div>
+        </div>
         </div>
     {{/each}}
 {{/if}}

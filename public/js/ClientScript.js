@@ -30,7 +30,6 @@ function makePostPublic(postId, isPublic) {
     console.log("post id sent : " + postId);
 }
 
-
 $(function(){
     $('#submit-post').click(function(e){
         e.preventDefault();
@@ -62,9 +61,9 @@ $(function(){
                         "<h6 class=\"message-author\">By: " + data.authorName + "</h6>" +
                         "<p class=\"message-body\">" + data.message + "</p>" +
                         "<div class=\"button-group-2\">" +
-                        "<button class=\"btn btn-primary\" >Comment</button> " +
-                        "<button class=\"btn btn-success\" >Like</button> " +
-                        "<button type=\"submit\" class=\"btn btn-warning\" onclick=\"makePostPublic(\'" + data.id + "\'," + data.private + ")\">" +
+                        "<button class=\"btn btn-primary\" >Comment (0)</button> " +
+                        "<button class=\"btn btn-success\" onclick=\"toggleLike(\'" + data.id + "\',true)\">Like (0)</button> " +
+                        "<button class=\"btn btn-warning\" onclick=\"makePostPublic(\'" + data.id + "\'," + data.private + ")\">" +
                         buttonText + "</button>" +
                         "</div>" +
                         "</div>" +
@@ -86,22 +85,31 @@ $(function(){
     });
 });
 
-
-/*
-
- "<div class=\"row\"> "+
- "<div class=\"col-md-12\"> " +
- "<div class=\"thumbnail\">" +
- "<div class=\"caption\">" +
- "<p class=\"message-id\" hidden>"+data.id+"</p>" +
- "<h3 class=\"message-header\"><i class=\"fa fa-comment\" aria-hidden=\"true\"></i>" + data.title + "</h3>" +
- "<h6 class=\"message-author\">By: "+data.username+"</h6>" +
- "<p class=\"message-body\">"+data.message+"</p>" +
- "<div class=\"button-group-2\">" +
- "<button class=\"btn btn-primary\" id=\"comment-button\">Comment</button>" +
- "<button class=\"btn btn-success\" id=\"like-button\">Like</button>" +
- "<button type=\"submit\" class=\"btn btn-warning\" onclick=\"makePostPublic(\'"+data.id+"\', true)\">" +
- "Make Public" +
- "</button>"
-
- */
+function toggleLike(postId, isLiked) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange=function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var posts = document.getElementsByClassName("caption");
+            for(var i = 0; i < posts.length; i++) {
+                if(postId == $('.message-id', posts[i]).text()){
+                    var likeNum = !posts[i].likes ? 0 : Object.keys(posts[i].likes).length;
+                    console.log("found: " + $('.message-id', posts[i]).text());
+                    console.log("likes on post : " + likeNum);
+                    if(isLiked) {
+                        $('.btn-success', posts[i]).attr('onClick', 'toggleLike("' + postId + '", false)');
+                        $('.btn-success', posts[i]).html("Unlike (" + (likeNum+1) + ")");
+                        console.log("Liked: " + postId);
+                    }
+                    else {
+                        $('.btn-success', posts[i]).attr('onClick', 'toggleLike("' + postId + '", true)');
+                        $('.btn-success', posts[i]).html('Like (' + likeNum + ')');
+                        console.log("Unliked: " + postId);
+                    }
+                }
+            }
+        }
+    };
+    xhttp.open("GET", "/?toggleLikeOn=" + postId, true);
+    xhttp.send();
+    console.log("post id sent : " + postId);
+}

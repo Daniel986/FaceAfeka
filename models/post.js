@@ -21,7 +21,9 @@ var post = new Schema({
     comments: [comment],
     likes: [like],
     private: {type: Boolean, required: true, default: false},
-    created: { type: Date, default: Date.now }
+    created: { type: Date, default: Date.now },
+    liked: {type: Boolean},
+    img: { data: Buffer, contentType: String }
 });
 
 module.exports = mongoose.model('post', post);

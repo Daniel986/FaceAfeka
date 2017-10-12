@@ -11,6 +11,7 @@ var Promise = require('bluebird');
 var index = require('./routes/index');
 var app = express();
 var Handlebars = require('handlebars');
+var multer = require('multer');
 
 // var promise = mongoose.connect('mongodb://localhost', {
 //     useMongoClient: true,
