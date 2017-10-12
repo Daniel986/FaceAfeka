@@ -210,8 +210,14 @@ router.get('/friends', function(req, res, next) {
         });
     }
     else {
-        User.findOne({username: req.session.user.username}, function(err, currentUser) {
-            res.render('friends', {title: 'Your stoopid friends', friends: currentUser.friends, logged: true});
+        User.findOne({username: req.session.user.username}, function (err, currentUser) {
+            res.render('friends', {
+                    title: 'Your stoopid friends',
+                    friends: currentUser.friends,
+                    logged: true,
+                    user: req.session.user
+                }
+            );
         });
     }
 });
