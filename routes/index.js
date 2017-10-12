@@ -50,13 +50,13 @@ router.get('/', function(req, res, next) {
             return;
         }
         if(req.query.toggleLikeOn) {
+            var checkIfLiked = false;
+            var numOfLikes = 0;
+            res.setHeader('Content-Type', 'text/plain');
             console.log("Adding like to: " + req.query.toggleLikeOn);
             Post.findOne({_id: req.query.toggleLikeOn}, function (err, post) {
-                var checkIfLiked = false;
                 var arr = post.likes;
                 var likeToRemove;
-                //console.log("BDIKA: " + arr.length);
-                //if(arr.length)
                 for(var i = 0; i < arr.length; i++)
                 {
                     //console.log("author: " + arr[i].author + " user: " + req.session.user._id);
@@ -78,14 +78,16 @@ router.get('/', function(req, res, next) {
                     post.likes.push({author: req.session.user, authorName: req.session.user.username});
                     //console.log(JSON.stringify(post));
                 }
-                post.save();
+                numOfLikes = arr.length;
+                post.save(function(err, result) {
+                    res.json(numOfLikes.toString());
+                });
                 if(err) {
                     console.log("DDNT SAVE");
                 }
                 else
                     console.log("FOOKIN SAVED");
             });
-            res.send();
             return;
         }
         Post.find({$or: [{$and: [{private : true}, {authorName: { $eq: req.session.user.username }}]}, {private : false}]})
@@ -157,8 +159,8 @@ router.post('/newPost', function(req, res, next) {
         likes: [],
         private: req.body.private
     }).save(function(err, result) {
-        console.log("SHOMER TO DB: " + result);
-        console.log("ID: " + result._id);
+        //console.log("SHOMER TO DB: " + result);
+        //console.log("ID: " + result._id);
         req.body.id = result._id;
         res.send(req.body);
     });

@@ -10,7 +10,7 @@ function makePostPublic(postId, isPublic) {
             var posts = document.getElementsByClassName("caption");
             for(var i = 0; i < posts.length; i++) {
                 if(postId == $('.message-id', posts[i]).text()){
-                    console.log("found: " + $('.message-id', posts[i]).text());
+                    //console.log("found: " + $('.message-id', posts[i]).text());
                     if(isPublic) {
                         $('.btn-warning', posts[i]).attr('onClick', 'makePostPublic("' + postId + '", false)');
                         $('.btn-warning', posts[i]).html('Make Private');
@@ -27,7 +27,7 @@ function makePostPublic(postId, isPublic) {
     };
     xhttp.open("GET", "/?changePrivacyOn=" + postId, true);
     xhttp.send();
-    console.log("post id sent : " + postId);
+    //console.log("post id sent : " + postId);
 }
 
 $(function(){
@@ -37,7 +37,7 @@ $(function(){
         data.title = $('#title-holder').val();
         data.message = $('#body-holder').val();
         data.private = $('#private-check').is(':checked');
-        console.log(JSON.stringify(data));
+        //console.log(JSON.stringify(data));
 
         if(!isEmpty(data.title) && !isEmpty(data.message)) {
             $.ajax({
@@ -89,21 +89,23 @@ function toggleLike(postId, isLiked) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange=function() {
         if (this.readyState == 4 && this.status == 200) {
+            var numOfLikes = this.responseText.slice(1,this.responseText.length-1);
+            //console.log("refined num of likes: " + numOfLikes);
             var posts = document.getElementsByClassName("caption");
             for(var i = 0; i < posts.length; i++) {
                 if(postId == $('.message-id', posts[i]).text()){
-                    var likeNum = !posts[i].likes ? 0 : Object.keys(posts[i].likes).length;
-                    console.log("found: " + $('.message-id', posts[i]).text());
-                    console.log("likes on post : " + likeNum);
+                    //console.log("found: " + $('.message-id', posts[i]).text());
                     if(isLiked) {
                         $('.btn-success', posts[i]).attr('onClick', 'toggleLike("' + postId + '", false)');
-                        $('.btn-success', posts[i]).html("Unlike (" + (likeNum+1) + ")");
+                        $('.btn-success', posts[i]).html("Unlike (" + numOfLikes + ")");
                         console.log("Liked: " + postId);
+                        break;
                     }
                     else {
                         $('.btn-success', posts[i]).attr('onClick', 'toggleLike("' + postId + '", true)');
-                        $('.btn-success', posts[i]).html('Like (' + likeNum + ')');
+                        $('.btn-success', posts[i]).html('Like (' + numOfLikes + ')');
                         console.log("Unliked: " + postId);
+                        break;
                     }
                 }
             }
@@ -111,5 +113,5 @@ function toggleLike(postId, isLiked) {
     };
     xhttp.open("GET", "/?toggleLikeOn=" + postId, true);
     xhttp.send();
-    console.log("post id sent : " + postId);
+    //console.log("post id sent : " + postId);
 }
