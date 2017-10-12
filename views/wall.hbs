@@ -1,30 +1,50 @@
 <h1>Welcome to {{wallOwner}}'s wall</h1>
 {{# each posts}}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="thumbnail">
-                <div class="caption">
-                    <p class="message-id" hidden>{{this._id}}</p>
-                    <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
-                    <h6 class="message-author">By: {{this.authorName}}</h6>
-                    <p class="message-body">{{this.body}}</p>
-                    <div class="button-group-2">
-                        <button class="btn btn-primary" >Comment</button>{{this.comments}}
-                        <button class="btn btn-success" >Like</button>{{this.likes}}
-                        {{# ifCond this.authorName '===' ../user.username}}
-                            {{# if this.private}}
-                                <button type="submit" class="btn btn-warning" onclick="makePostPublic('{{this._id}}', true)">
-                                    Make Public
-                                </button>
-                            {{else}}
-                                <button type="submit" class="btn btn-warning" onclick="makePostPublic('{{this._id}}', false)">
-                                    Make Private
-                                </button>
-                            {{/if}}
-                        {{/ifCond}}
+    <div class="post">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="thumbnail">
+                    <div class="caption">
+                        <p class="message-id" hidden>{{this._id}}</p>
+                        <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
+                        <h6 class="message-author">By: {{this.authorName}}</h6>
+                        <p class="message-body">{{this.body}}</p>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="button-group-2">
+            <button class="btn btn-primary comment" onclick="postNewComment('{{this._id}}')">
+                Comment <span class="badge">{{this.comments.length}}</span>
+            </button>
+            {{# if this.liked}}
+                <button class="btn btn-success" onclick="toggleLike('{{this._id}}', false)">
+                    Unlike <span class="badge">{{this.likes.length}}</span>
+                </button>
+            {{else}}
+                <button class="btn btn-success" onclick="toggleLike('{{this._id}}', true)">
+                    Like <span class="badge">{{this.likes.length}}</span>
+                </button>
+            {{/if}}
+            {{# ifCond this.authorName '===' ../user.username}}
+                {{# if this.private}}
+                    <button class="btn btn-warning" onclick="makePostPublic('{{this._id}}', true)">
+                        Make Public
+                    </button>
+                {{else}}
+                    <button class="btn btn-warning" onclick="makePostPublic('{{this._id}}', false)">
+                        Make Private
+                    </button>
+                {{/if}}
+            {{/ifCond}}
+        </div>
+        <textarea class="form-control comment-holder" rows="2" placeholder="comment" ></textarea>
+        {{# each this.comments}}
+            <div class="comment-box">
+                <h6 class="comment-author">Comment by: {{this.authorName}}</h6>
+                <p class="comment-body">{{this.body}} </p>
+            </div>
+        {{/each}}
+        <div class='last-comment'></div>
     </div>
 {{/each}}

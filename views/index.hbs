@@ -5,87 +5,102 @@
 <!--</div>-->
 
 <!--<form id="frmUploader" enctype="multipart/form-data" action="Upload/" method="post">-->
-    <!--<input type="file" name="imgUploader" multiple />-->
-    <!--<input type="submit" name="submit" id="btnSubmit" value="Upload" />-->
+<!--<input type="file" name="imgUploader" multiple />-->
+<!--<input type="submit" name="submit" id="btnSubmit" value="Upload" />-->
 <!--</form>-->
+
+<!--<input type="text" class="form-control" name="titleHolder" value="" placeholder="Title" id="title-holder">-->
+<!--<textarea class="form-control input-lg" name="bodyHolder" rows="3" placeholder="What is up today?" id="body-holder"></textarea>-->
+<!--<input type="file" name="imgUploader" id="image-uploader" /><br>-->
+<!--<button class="btn btn-primary btn-lg" name="commit" id="submit-post">Post</button>-->
+<!--<label><input type="checkbox" id="private-check" name="privateCheck"> Private?</label>-->
 
 {{# if logged}}
     <form method="post" action="/" id="post-form" enctype="multipart/form-data">
         <div class="form-group">
             {{error}}
             <input type="text" class="form-control" name="titleHolder" value="" placeholder="Title" id="title-holder">
-            <textarea class="form-control input-lg" name="bodyHolder" rows="3" placeholder="What is up today?" id="body-holder"></textarea>
-            <input type="file" name="imgUploader" multiple /><br>
+            <textarea class="form-control" name="bodyHolder" rows="3" placeholder="What is up today?" id="body-holder"></textarea>
+            <input type="file" name="imgUploader" id="image-uploader" /><br>
             <button class="btn btn-primary btn-lg" name="commit" id="submit-post">Post</button>
             <label><input type="checkbox" id="private-check" name="privateCheck"> Private?</label>
         </div>
     </form>
     {{# each posts}}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="thumbnail">
-                    <div class="caption">
-                        <p class="message-id" hidden>{{this._id}}</p>
-                        <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
-                        <h6 class="message-author">By: {{this.authorName}}</h6>
-                        <p class="message-body">{{this.body}}</p>
-                        <div class="button-group-2">
-                            <button class="btn btn-primary" >Comment ({{this.comments.length}})</button>{{this.comments}}
-                            {{# if this.liked}}
-                                <button class="btn btn-success" onclick="toggleLike('{{this._id}}', false)">
-                                    Unlike ({{this.likes.length}})
-                                </button>
-                            {{else}}
-                                <button class="btn btn-success" onclick="toggleLike('{{this._id}}', true)">
-                                    Like ({{this.likes.length}})
-                                </button>
-                            {{/if}}
-                            {{# ifCond this.authorName '===' ../user.username}}
-                                {{# if this.private}}
-                                    <button class="btn btn-warning" onclick="makePostPublic('{{this._id}}', true)">
-                                        Make Public
-                                    </button>
-                                {{else}}
-                                    <button class="btn btn-warning" onclick="makePostPublic('{{this._id}}', false)">
-                                        Make Private
-                                    </button>
-                                {{/if}}
-                            {{/ifCond}}
+        <div class="post">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="thumbnail">
+                        <div class="caption">
+                            <p class="message-id" hidden>{{this._id}}</p>
+                            <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
+                            <h6 class="message-author">By: {{this.authorName}}</h6>
+                            <p class="message-body">{{this.body}}</p>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="button-group-2">
+                <button class="btn btn-primary comment" onclick="postNewComment('{{this._id}}')">
+                    Comment <span class="badge">{{this.comments.length}}</span>
+                </button>
+                {{# if this.liked}}
+                    <button class="btn btn-success" onclick="toggleLike('{{this._id}}', false)">
+                        Unlike <span class="badge">{{this.likes.length}}</span>
+                    </button>
+                {{else}}
+                    <button class="btn btn-success" onclick="toggleLike('{{this._id}}', true)">
+                        Like <span class="badge">{{this.likes.length}}</span>
+                    </button>
+                {{/if}}
+                {{# ifCond this.authorName '===' ../user.username}}
+                    {{# if this.private}}
+                        <button class="btn btn-warning" onclick="makePostPublic('{{this._id}}', true)">
+                            Make Public
+                        </button>
+                    {{else}}
+                        <button class="btn btn-warning" onclick="makePostPublic('{{this._id}}', false)">
+                            Make Private
+                        </button>
+                    {{/if}}
+                {{/ifCond}}
+            </div>
+            <textarea class="form-control comment-holder" rows="2" placeholder="comment" ></textarea>
+            {{# each this.comments}}
+            <div class="comment-box">
+                <h6 class="comment-author">Comment by: {{this.authorName}}</h6>
+                <p class="comment-body">{{this.body}} </p>
+            </div>
+            {{/each}}
+            <div class='last-comment'></div>
         </div>
     {{/each}}
 {{else}}
     {{# each posts}}
-        <div class="row">
-        <div class="col-md-12 well-lg">
-        <div class="thumbnail">
-        <div class="caption">
-            <p class="message-id" hidden>{{this._id}}</p>
-            <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
-            <h6 class="message-author">By: {{this.authorName}}</h6>
-            <p class="message-body">{{this.body}}</p>
-        <p class="button-group-2">
-            <button class="btn btn-primary disabled" >Comment ({{this.comments.length}})</button>
-        {{# each this.comments}}
-                <div class="row">
-                    <div class="col-md-6 well-lg">
-                        <div class="thumbnail">
-                            <div class="caption">
-                                <h6 class="comment-author">By: {{this.authorName}}</h6>
-                <p class="comment-body">{{this.body}} </p>
+        <div class="post">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="thumbnail">
+                        <div class="caption">
+                            <p class="message-id" hidden>{{this._id}}</p>
+                            <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
+                            <h6 class="message-author">By: {{this.authorName}}</h6>
+                            <p class="message-body">{{this.body}}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            </div>
-            </div>
-            </div>
-        {{/each}}
-        <button class="btn btn-success disabled">Like ({{this.likes.length}})</button>
-        </p>
-        </div>
-        </div>
-        </div>
+            <p class="button-group-2">
+                <button class="btn btn-primary disabled">Comment <span class="badge">{{this.comments.length}}</span></button>
+                <button class="btn btn-success disabled">Like <span class="badge">{{this.likes.length}}</span></button>
+            </p>
+            {{# each this.comments}}
+                <div class="comment-box">
+                    <h6 class="comment-author">Comment by: {{this.authorName}}</h6>
+                    <p class="comment-body">{{this.body}} </p>
+                </div>
+            {{/each}}
+            <div class='last-comment'></div>
         </div>
     {{/each}}
 {{/if}}

@@ -7,7 +7,7 @@ var Post = require('../models/post');
 var multiparty = require('multiparty');
 var format = require('util').format;
 var multer = require('multer');
-var upload = multer({ storage: Storage }).array("imgUploader", 1); //Field name and max count
+var fs = require("fs");
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
         callback(null, "../public/images/");
@@ -16,6 +16,7 @@ var Storage = multer.diskStorage({
         callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
     }
 });
+var upload = multer({ storage: Storage }).array("imgUploader", 1); //Field name and max count
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -30,25 +31,6 @@ router.get('/', function(req, res, next) {
             });
     }
     else {
-        if(req.query.changePrivacyOn) {
-            console.log("Changing privacy on: " + req.query.changePrivacyOn);
-            Post.findOne({_id: req.query.changePrivacyOn}, function (err, post) {
-                if(post != null){
-                    if(post.private)
-                        post.private = false;
-                    else
-                        post.private = true;
-                    post.save();
-                    if(err) {
-                        console.log("DDNT SAVE");
-                    }
-                    else
-                        console.log("FOOKIN SAVED");
-                }
-            });
-            res.send();
-            return;
-        }
         if(req.query.toggleLikeOn) {
             var checkIfLiked = false;
             var numOfLikes = 0;
@@ -87,6 +69,44 @@ router.get('/', function(req, res, next) {
                 }
                 else
                     console.log("FOOKIN SAVED");
+            });
+            return;
+        }
+        if(req.query.changePrivacyOn) {
+            console.log("Changing privacy on: " + req.query.changePrivacyOn);
+            Post.findOne({_id: req.query.changePrivacyOn}, function (err, post) {
+                if(post != null){
+                    if(post.private)
+                        post.private = false;
+                    else
+                        post.private = true;
+                    post.save();
+                    if(err) {
+                        console.log("DDNT SAVE");
+                    }
+                    else
+                        console.log("FOOKIN SAVED");
+                }
+            });
+            res.send();
+            return;
+        }
+        if(req.query.newCommentOn) {
+            res.setHeader('Content-Type', 'text/plain');
+            console.log("Adding comment to: " + req.query.newCommentOn);
+            Post.findOne({_id: req.query.newCommentOn}, function (err, post) {
+                var arr = post.comments;
+                arr.push({author: req.session.user, authorName: req.session.user.username, body: req.query.comment});
+                //console.log(JSON.stringify(post));
+                numOfComments = arr.length;
+                post.save(function(err, result) {
+                    res.json({'num': numOfComments.toString(), 'authorName': req.session.user.username});
+                });
+                if(err) {
+                    console.log("DDNT SAVE");
+                }
+                else
+                    console.log("A NEW COMMENT WAS MADE!");
             });
             return;
         }
@@ -141,13 +161,12 @@ router.get('/wall', function(req, res, next) {
 });
 
 router.post('/newPost', function(req, res, next) {
-    var obj = {};
-    console.log('body: ' + JSON.stringify(req.body));
     upload(req, res, function (err) {
         if (err) {
             console.log("Something went wrong!");
         }
         console.log("File uploaded sucessfully!.");
+        console.log('body: ' + JSON.stringify(req.body));
     });
     req.body.authorName = req.session.user.username;
     new Post({
