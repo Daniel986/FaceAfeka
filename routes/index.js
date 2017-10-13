@@ -8,9 +8,11 @@ var multiparty = require('multiparty');
 var format = require('util').format;
 var multer = require('multer');
 var fs = require("fs");
+var path = require('path');
+var formidable = require('formidable'), readChunk = require('read-chunk'), fileType = require('file-type');
 var Storage = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, "../public/images/");
+        callback(null, "../public/user-images/");
     },
     filename: function (req, file, callback) {
         callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
@@ -160,14 +162,128 @@ router.get('/wall', function(req, res, next) {
 
 });
 
-router.post('/newPost', function(req, res, next) {
-    upload(req, res, function (err) {
+router.get('/uploads', function(req, res, next) {
+    console.log("entering GET");
+    var filesPath = path.join(__dirname, '..public/uploads/');
+    fs.readdir(filesPath, function (err, files) {
         if (err) {
-            console.log("Something went wrong!");
+            console.log(err);
+            return;
         }
-        console.log("File uploaded sucessfully!.");
-        console.log('body: ' + JSON.stringify(req.body));
+
+        files.forEach(function (file) {
+            fs.stat(filesPath + file, function (err, stats) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+
+                var createdAt = Date.parse(stats.ctime),
+                    days = Math.round((Date.now() - createdAt) / (1000*60*60*24));
+
+                if (days > 1) {
+                    fs.unlink(filesPath + file);
+                }
+            });
+        });
     });
+    console.log("exiting GET");
+    res.sendFile(path.join(__dirname, '../views/index.hbs'));
+
+});
+
+router.post('/PostWithImage', function(req, res, next) {
+    var photos = [];
+    var form = new formidable.IncomingForm();
+    console.log("entering POST");
+    // Tells formidable that there will be multiple files sent.
+    form.multiples = true;
+    // Upload directory for the images
+    form.uploadDir = path.join(__dirname, '../tmp_uploads');
+    // Invoked when a file has finished uploading.
+    form.on('file', function (name, file) {
+        // Allow only 3 files to be uploaded.
+        if (photos.length === 3) {
+            fs.unlink(file.path);
+            return true;
+        }
+
+        var buffer = null,
+            type = null,
+            filename = '';
+
+        // Read a chunk of the file.
+        buffer = readChunk.sync(file.path, 0, 262);
+        // Get the file type using the buffer read using read-chunk
+        type = fileType(buffer);
+
+        // Check the file type, must be either png,jpg or jpeg
+        if (type !== null && (type.ext === 'png' || type.ext === 'jpg' || type.ext === 'jpeg')) {
+            // Assign new file name
+            filename = Date.now() + '-' + file.name;
+
+            // Move the file with the new file name
+            fs.rename(file.path, path.join(__dirname, '../public/uploads/' + filename));
+
+
+            // Add to the list of photos
+            photos.push({
+                status: true,
+                filename: filename,
+                type: type.ext,
+                publicPath: 'uploads/' + filename
+            });
+        } else {
+            photos.push({
+                status: false,
+                filename: file.name,
+                message: 'Invalid file type'
+            });
+            fs.unlink(file.path);
+        }
+    });
+
+    form.on('error', function(err) {
+        console.log('Error occurred during processing - ' + err);
+    });
+
+    // Invoked when all the fields have been processed.
+    form.on('end', function() {
+        console.log('All the request fields have been processed.');
+    });
+
+    // Parse the incoming form fields.
+    form.parse(req, function (err, fields, files) {
+        var ret = {};
+        // console.log("title : " + fields.title);
+        // console.log("body : " + fields.message);
+        // console.log("privacy : " + fields.private);
+        // console.log("user : " + req.session.user.username);
+        new Post({
+            header: fields.title,
+            author: req.session.user,
+            authorName: req.session.user.username,
+            body: fields.message,
+            comments: [],
+            likes: [],
+            private: fields.private,
+            imgs: photos
+        }).save(function(err, result) {
+            if(!err){
+                //console.log("SHOMER TO DB: " + result);
+                ret = result;
+                //res.json(req.body);
+                res.status(200).json(result);
+            }
+            else {
+                console.log("Niggered, because there is a " + err);
+            }
+        });
+
+    });
+});
+
+router.post('/newPost', function(req, res, next) {
     req.body.authorName = req.session.user.username;
     new Post({
         header: req.body.title,
@@ -176,7 +292,8 @@ router.post('/newPost', function(req, res, next) {
         body: req.body.message,
         comments: [],
         likes: [],
-        private: req.body.private
+        private: req.body.private,
+        imgs: []
     }).save(function(err, result) {
         //console.log("SHOMER TO DB: " + result);
         //console.log("ID: " + result._id);
