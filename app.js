@@ -11,7 +11,6 @@ var Promise = require('bluebird');
 var index = require('./routes/index');
 var app = express();
 var Handlebars = require('handlebars');
-var multer = require('multer');
 
 // var promise = mongoose.connect('mongodb://localhost', {
 //     useMongoClient: true,
@@ -53,6 +52,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'uploads')));
+app.use(express.static('uploads'));
 
 app.use('/', index);
 

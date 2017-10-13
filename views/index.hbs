@@ -1,27 +1,12 @@
 
-<!--<div id="Under-construction">-->
-<!--<h2>changing privacy state</h2>-->
-<!--<button type="button" onclick="makePostPublic('59da64a7078acb09807c29aa', true)">Change Privacy</button>-->
-<!--</div>-->
-
-<!--<form id="frmUploader" enctype="multipart/form-data" action="Upload/" method="post">-->
-<!--<input type="file" name="imgUploader" multiple />-->
-<!--<input type="submit" name="submit" id="btnSubmit" value="Upload" />-->
-<!--</form>-->
-
-<!--<input type="text" class="form-control" name="titleHolder" value="" placeholder="Title" id="title-holder">-->
-<!--<textarea class="form-control input-lg" name="bodyHolder" rows="3" placeholder="What is up today?" id="body-holder"></textarea>-->
-<!--<input type="file" name="imgUploader" id="image-uploader" /><br>-->
-<!--<button class="btn btn-primary btn-lg" name="commit" id="submit-post">Post</button>-->
-<!--<label><input type="checkbox" id="private-check" name="privateCheck"> Private?</label>-->
-
 {{# if logged}}
     <form method="post" action="/" id="post-form" enctype="multipart/form-data">
         <div class="form-group">
-            {{error}}
+            <div id='preview-text'></div>
+            <div id="image-preview"></div>
             <input type="text" class="form-control" name="titleHolder" value="" placeholder="Title" id="title-holder">
             <textarea class="form-control" name="bodyHolder" rows="3" placeholder="What is up today?" id="body-holder"></textarea>
-            <input type="file" name="imgUploader" id="image-uploader" /><br>
+            <input type="file" id="image-uploader" name="photos[]" accept="image/*" onchange="previewImages(true)" multiple="multiple"/><br>
             <button class="btn btn-primary btn-lg" name="commit" id="submit-post">Post</button>
             <label><input type="checkbox" id="private-check" name="privateCheck"> Private?</label>
         </div>
@@ -35,7 +20,13 @@
                             <p class="message-id" hidden>{{this._id}}</p>
                             <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
                             <h6 class="message-author">By: {{this.authorName}}</h6>
-                            <p class="message-body">{{this.body}}</p>
+                            <p class="message-body">{{this.body}}<br><br>Album:
+                            <div class="album">
+                                {{# each this.imgs}}
+                                    <a class="fancybox-thumb" rel="{{../_id}}" href="{{this.publicPath}}" title="{{../body}}"><img src="{{this.publicPath}}" alt="" height="100" width="100" /></a>
+                                {{/each}}
+                            </div>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -67,10 +58,10 @@
             </div>
             <textarea class="form-control comment-holder" rows="2" placeholder="comment" ></textarea>
             {{# each this.comments}}
-            <div class="comment-box">
-                <h6 class="comment-author">Comment by: {{this.authorName}}</h6>
-                <p class="comment-body">{{this.body}} </p>
-            </div>
+                <div class="comment-box">
+                    <h6 class="comment-author">Comment by: {{this.authorName}}</h6>
+                    <p class="comment-body">{{this.body}} </p>
+                </div>
             {{/each}}
             <div class='last-comment'></div>
         </div>
@@ -85,7 +76,13 @@
                             <p class="message-id" hidden>{{this._id}}</p>
                             <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
                             <h6 class="message-author">By: {{this.authorName}}</h6>
-                            <p class="message-body">{{this.body}}</p>
+                            <p class="message-body">{{this.body}}<br><br>Album:
+                            <div class="album">
+                                {{# each this.imgs}}
+                                    <a class="fancybox-thumb" rel="{{../_id}}" href="{{this.publicPath}}" title="{{../body}}"><img src="{{this.publicPath}}" alt="" height="100" width="100" /></a>
+                                {{/each}}
+                            </div>
+                            </p>
                         </div>
                     </div>
                 </div>

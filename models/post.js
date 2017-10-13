@@ -13,6 +13,14 @@ var like = new Schema({
     authorName : {type: String}
 });
 
+var image = new Schema({
+    status: {type: String},
+    filename : {type: String},
+    type: {type: String},
+    publicPath: {type: String},
+    message: {type: String}
+});
+
 var post = new Schema({
     header: {type: String, required: true},
     author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
@@ -23,7 +31,7 @@ var post = new Schema({
     private: {type: Boolean, required: true, default: false},
     created: { type: Date, default: Date.now },
     liked: {type: Boolean},
-    img: { data: Buffer, contentType: String }
+    imgs: [image]
 });
 
 module.exports = mongoose.model('post', post);
