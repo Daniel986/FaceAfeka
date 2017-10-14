@@ -18,7 +18,7 @@ var Twitter = new TwitterPackage(secret);
 var filterAmount = 20;
 var tweetsRecievedAmnt = 0;
 var twitUser;
-var subjectsToFollow = 'emoji, god, bible, jesus';
+var subjectsToFollow = 'god, bible, jesus';
 
 mongoose.connect('mongodb://localhost:27017/faceafeka', {useMongoClient: true});
 
@@ -42,11 +42,9 @@ function startTwitterStream() {
                     return searchGoogleImages(tweetSentiment.words.join(' '))
                         .then(function (images) {
                             console.log(images);
-                            console.log('Adding new post to FaceAfeka with one of the retrieved images');
-                            var randImage = images[Math.floor(Math.random() * images.length)];
-                            console.log(randImage);
-
-                            savePostDirectlyToDb(tweetSentiment, randImage, event.user.name);
+                            console.log('Adding new post to FaceAfeka with 3 of the retrieved images');
+                            images.splice(3,1);
+                            savePostDirectlyToDb(tweetSentiment, images, event.user.name);
                         });
             }
         });
@@ -57,13 +55,21 @@ function startTwitterStream() {
     });
 }
 
-function savePostDirectlyToDb(tweetSentiment, image, theRetardWhoPostedThis) {
+function savePostDirectlyToDb(tweetSentiment, images, theRetardWhoPostedThis) {
     var sentiment;
     if (tweetSentiment.score >= 1) sentiment = 'a happy';
     else if (tweetSentiment.score <= -1) sentiment = 'an intense';
     else sentiment = 'a boring';
     var postBody = 'I found ' + sentiment + ' post about ' + tweetSentiment.words.join(' and ') + '.\nBy ' + theRetardWhoPostedThis;
-    // Will add image src to post once ragnar implements it
+    var photos = _.map(images, function(linkToImage) {
+        return {
+            status: true,
+            filename : '',
+            type: '',
+            publicPath: linkToImage,
+            message: 'who wants to be king'
+        }
+    });
     new Post({
         header: 'Another one',
         author: twitUser,
@@ -71,7 +77,8 @@ function savePostDirectlyToDb(tweetSentiment, image, theRetardWhoPostedThis) {
         body: postBody,
         comments: [],
         likes: [],
-        private: false
+        private: false,
+        imgs: photos
     }).save(function(err, result) {
         console.log("SHOMER TO DB: " + result);
         console.log("ID: " + result._id);

@@ -8,12 +8,14 @@
                         <p class="message-id" hidden>{{this._id}}</p>
                         <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
                         <h6 class="message-author">By: {{this.authorName}}</h6>
-                        <p class="message-body">{{this.body}}<br><br>Album:
+                        <p class="message-body">{{this.body}}
+                        {{# if this.imgs}}<br><br>Album:
                         <div class="album">
                             {{# each this.imgs}}
                                 <a class="fancybox-thumb" rel="{{../_id}}" href="{{this.publicPath}}" title="{{../body}}"><img src="{{this.publicPath}}" alt="" height="100" width="100" /></a>
                             {{/each}}
                         </div>
+                        {{/if}}
                         </p>
                     </div>
                 </div>
