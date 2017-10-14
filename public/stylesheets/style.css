@@ -5,6 +5,8 @@
     border: 1px dotted black;
     border-radius: 15px;
     width: 80%;
+    word-break: break-all;
+    white-space: normal;
 }
 
 .col-md-12 .message-header
@@ -83,6 +85,8 @@
     margin: 5px;
     width: 30%;
     left: 7%;
+    word-break: break-all;
+    white-space: normal;
 }
 
 #image-preview
