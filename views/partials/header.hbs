@@ -7,11 +7,11 @@
     <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
             <li class="nav-item active">
-                <a class="nav-link" href="/"><i class="fa fa-home" aria-hidden="true"></i> Home <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="/"><i class="fa fa-home" aria-hidden="true"></i> Home <span class="sr-only"></span></a>
             </li>
             {{#unless user}}
                 <li class="nav-item">
-                    <a class="nav-link" href="/signup"><i class="fa fa-handshake-o" aria-hidden="true"></i> Signup</a>
+                    <a class="nav-link" href="/signup"><i class="fa fa-address-card-o" aria-hidden="true"></i> Signup</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/login"><i class="fa fa-handshake-o" aria-hidden="true"></i> Login</a>
@@ -27,24 +27,24 @@
                         <i class="fa fa-user" aria-hidden="true"></i> Account
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">My Account</a>
-                        <a class="dropdown-item" href="/logout">Log Out</a>
+                        <a class="dropdown-item" href="/wall?username={{this.user.username}}"> My Account </a>
+                        <a class="dropdown-item" href="/logout"> Log Out </a>
                     </div>
                 </li>
             {{/if}}
             <li class="nav-item">
                 {{#if user}}
-                    <i>Signed in as {{user.username}}</i>
+                    <p id="signed-in-text"> Signed in as {{user.username}}</p>
                 {{/if}}
             </li>
         </ul>
         {{#if friendsError}}
-            {{friendsError}}
+             {{friendsError}}
         {{/if}}
         <br>
         <form class="form-inline my-2 my-lg-0" action="/add_friend" method="post">
             <div id="remote">
-                <input class="typeahead" name='friend_name' type="text" placeholder="Type friend's name">
+                <input class="typeahead form-control" name='friend_name' type="text" placeholder="Type friend's name">
             </div>
 
             <script>

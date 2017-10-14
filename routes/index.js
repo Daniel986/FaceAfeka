@@ -119,9 +119,8 @@ router.get('/', function(req, res, next) {
             .exec(function(err, posts) {
                 for(var i = 0; i < posts.length; i++)
                 {
-
                     if(posts[i].likes) {
-                        console.log("numOfLikes: " + posts[i].likes.length);
+                        //console.log("numOfLikes: " + posts[i].likes.length);
                         for (var j = 0; j < posts[i].likes.length; j++) {
                             //console.log("author: " + posts[i].likes[j].author + " user: " + req.session.user._id);
                             if (posts[i].likes[j].author == req.session.user._id) {
@@ -131,7 +130,7 @@ router.get('/', function(req, res, next) {
                             }
                         }
                     }
-                    console.log(JSON.stringify(posts[i]));
+                    //console.log(JSON.stringify(posts[i]));
                 }
                 return res.render('index', {title: 'FaceAfeka', user: req.session.user,
                     posts: posts, logged: true});
@@ -375,6 +374,7 @@ router.get('/users', function(req, res) {
                     docs.forEach(function (doc) {
                         usernames.push(doc.username);
                     });
+                    console.log("users: " +  usernames);
                     return usernames;
                 }
             });
@@ -388,6 +388,7 @@ router.get('/users', function(req, res) {
                     docs.forEach(function (doc) {
                         usernames.push(doc.username);
                     });
+                    console.log("users: " +  usernames);
                     res.send(usernames);
                 }
             });
@@ -401,6 +402,7 @@ router.get('/users', function(req, res) {
                     docs.forEach(function (doc) {
                         usernames.push(doc.username);
                     });
+                    console.log("users: " +  usernames);
                     res.send(usernames);
                 }
             });
@@ -432,50 +434,76 @@ router.get('/friends', function(req, res, next) {
 router.post('/add_friend', function(req, res, next) {
     if (req.session.user==null) {
         console.log('user not logged in');
-        res.render('index', {
-            friendsError: 'Must be logged in to add friends',
-            title: 'FaceAfeka',
-            user: req.session.user,
-            posts: {}
-        });
+        Post.find({private : false})
+            .populate({path:'author', select:'-_id username'})
+            .sort({created: 'desc'})
+            .limit(5)
+            .exec(function(err, posts) {
+                return res.render('index', {friendsError: 'Must be logged in to add friends',
+                    title: 'FaceAfeka', user: req.session.user,
+                    posts: posts, logged: false});
+            });
     }
     else {
         User.findOne({username: req.body.friend_name}, function(err, result) {
             if (!result) {
-                res.render('index', {
-                    friendsError: 'Not a registered user',
-                    title: 'FaceAfeka',
-                    user: req.session.user,
-                    posts: {}
-                });
+                Post.find({private : false})
+                    .populate({path:'author', select:'-_id username'})
+                    .sort({created: 'desc'})
+                    .limit(5)
+                    .exec(function(err, posts) {
+                        return res.render('index', {friendsError: 'Not a registered user',
+                            title: 'FaceAfeka', user: req.session.user,
+                            posts: posts, logged: true});
+                    });
             }
             else {
                 User.findOne({username: req.session.user.username}, function(err, currentUser) {
                     if (currentUser.friends.includes(req.body.friend_name)) {
-                        res.render('index', {
-                            friendsError: 'You are already friends',
-                            title: 'FaceAfeka',
-                            user: req.session.user,
-                            posts: {}
-                        });
+                        Post.find({private : false})
+                            .populate({path:'author', select:'-_id username'})
+                            .sort({created: 'desc'})
+                            .limit(5)
+                            .exec(function(err, posts) {
+                                return res.render('index', {friendsError: 'You are already friends',
+                                    title: 'FaceAfeka', user: req.session.user,
+                                    posts: posts, logged: true});
+                            });
                     }
                     else if (currentUser.username == req.body.friend_name) {
-                        res.render('index', {
-                            friendsError: 'Cannot add self as friend',
-                            title: 'FaceAfeka',
-                            user: req.session.user,
-                            posts: {}
-                        });
+                        Post.find({private : false})
+                            .populate({path:'author', select:'-_id username'})
+                            .sort({created: 'desc'})
+                            .limit(5)
+                            .exec(function(err, posts) {
+                                return res.render('index', {friendsError: 'Cannot add self as friend',
+                                    title: 'FaceAfeka', user: req.session.user,
+                                    posts: posts, logged: true});
+                            });
                     }
                     else {
                         console.log('user ' + req.session.user.username + ' adding friend ' + req.body.friend_name);
                         currentUser.friends.push(req.body.friend_name);
-                        currentUser.save();
-                        res.redirect('/');
-                        console.log('adding the other way around');
-                        User.findOne({username: req.body.friend_name}, function(err, otherUser) {
-                            otherUser.friends.push(currentUser.username);
-                            otherUser.save();
+                        currentUser.save(function(err) {
+                            console.log('adding the other way around');
+                            User.findOne({username: req.body.friend_name}, function(err, otherUser) {
+                                otherUser.friends.push(currentUser.username);
+                                otherUser.save(function(err) {
+                                    if(!err)
+                                        Post.find({private : false})
+                                            .populate({path:'author', select:'-_id username'})
+                                            .sort({created: 'desc'})
+                                            .limit(5)
+                                            .exec(function(err, posts) {
+                                                req.session.user.friends.push(otherUser.username);
+                                                console.log("friends: " + req.session.user.friends);
+                                                return res.render('index', {
+                                                    friendsError: 'Friend added',
+                                                    title: 'FaceAfeka', user: req.session.user,
+                                                    posts: posts, logged: true});
+                                            });
+                                });
+                            })
                         });
                     }
                 });

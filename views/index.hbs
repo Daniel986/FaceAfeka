@@ -20,24 +20,36 @@
                             <p class="message-id" hidden>{{this._id}}</p>
                             <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
                             <h6 class="message-author">By: {{this.authorName}}</h6>
-                            <p class="message-body">{{this.body}}
-                                {{# if this.imgs}}
+                        <p class="message-body">{{this.body}}
+                            {{# if this.imgs}}
                                 <br><br>Album:
-                            <div class="album">
-                                {{# each this.imgs}}
-                                    <a class="fancybox-thumb" rel="{{../_id}}" href="{{this.publicPath}}" title="{{../body}}"><img src="{{this.publicPath}}" alt="" height="100" width="100" /></a>
-                                {{/each}}
-                            </div>
-                                {{/if}}
+                                <div class="album">
+                                    {{# each this.imgs}}
+                                        <a class="fancybox-thumb" rel="{{../_id}}" href="{{this.publicPath}}" title="{{../body}}"><img src="{{this.publicPath}}" alt="" height="100" width="100" /></a>
+                                    {{/each}}
+                                </div>
+                            {{/if}}
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="button-group-2">
-                <button class="btn btn-primary comment" onclick="postNewComment('{{this._id}}')">
-                    Comment <span class="badge">{{this.comments.length}}</span>
-                </button>
+                {{# ifCond ../user.friends 'includes' this.authorName}}
+                    <button class="btn btn-primary comment" onclick="postNewComment('{{this._id}}')">
+                        Comment <span class="badge">{{this.comments.length}}</span>
+                    </button>
+                {{else}}
+                    {{# ifCond this.authorName '===' ../user.username}}
+                        <button class="btn btn-primary comment" onclick="postNewComment('{{this._id}}')">
+                            Comment <span class="badge">{{this.comments.length}}</span>
+                        </button>
+                    {{else}}
+                        <button class="btn btn-primary comment" disabled>
+                            Comment <span class="badge">{{this.comments.length}}</span>
+                        </button>
+                    {{/ifCond}}
+                {{/ifCond}}
                 {{# if this.liked}}
                     <button class="btn btn-success" onclick="toggleLike('{{this._id}}', false)">
                         Unlike <span class="badge">{{this.likes.length}}</span>
@@ -85,12 +97,15 @@
                             <p class="message-id" hidden>{{this._id}}</p>
                             <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
                             <h6 class="message-author">By: {{this.authorName}}</h6>
-                            <p class="message-body">{{this.body}}<br><br>Album:
-                            <div class="album">
-                                {{# each this.imgs}}
-                                    <a class="fancybox-thumb" rel="{{../_id}}" href="{{this.publicPath}}" title="{{../body}}"><img src="{{this.publicPath}}" alt="" height="100" width="100" /></a>
-                                {{/each}}
-                            </div>
+                        <p class="message-body">{{this.body}}
+                            {{# if this.imgs}}
+                                <br><br>Album:
+                                <div class="album">
+                                    {{# each this.imgs}}
+                                        <a class="fancybox-thumb" rel="{{../_id}}" href="{{this.publicPath}}" title="{{../body}}"><img src="{{this.publicPath}}" alt="" height="100" width="100" /></a>
+                                    {{/each}}
+                                </div>
+                            {{/if}}
                             </p>
                         </div>
                     </div>

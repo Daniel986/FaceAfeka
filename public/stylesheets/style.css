@@ -63,6 +63,8 @@
     border-top: 1px dotted black;
     border-radius: 5px;
     background-color: lemonchiffon;
+    word-break: break-all;
+    white-space: normal;
 }
 
 .comment-body
@@ -70,6 +72,7 @@
     position: relative;
     left: 20%;
     font-size: large;
+    width: 70%;
 }
 
 .comment-author
@@ -104,4 +107,11 @@
 {
     padding: 15px;
     text-align: center;
+}
+
+#signed-in-text
+{
+    text-align: center;
+    margin-top: 9px;
+    margin-left: 5px;
 }

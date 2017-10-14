@@ -1,4 +1,20 @@
-<h1>Welcome to {{wallOwner}}'s wall</h1>
+
+{{# ifCond wallOwner '===' user.username}}
+    <h1>Welcome to {{wallOwner}}'s wall.<br> {{wallOwner}} talks in third person!</h1>
+    <form method="post" action="/" id="post-form" enctype="multipart/form-data">
+        <div class="form-group">
+            <div id='preview-text'></div>
+            <div id="image-preview"></div>
+            <input type="text" class="form-control" name="titleHolder" value="" placeholder="Title" id="title-holder">
+            <textarea class="form-control" name="bodyHolder" rows="3" placeholder="What is up today?" id="body-holder"></textarea>
+            <input type="file" id="image-uploader" name="photos[]" accept="image/*" onchange="previewImages(true)" multiple="multiple"/><br>
+            <button class="btn btn-primary btn-lg" name="commit" id="submit-post">Post</button>
+            <label><input type="checkbox" id="private-check" name="privateCheck"> Private?</label>
+        </div>
+    </form>
+{{else}}
+    <h1>Welcome to {{wallOwner}}'s wall</h1>
+{{/ifCond}}
 {{# each posts}}
     <div class="post">
         <div class="row">
@@ -8,13 +24,14 @@
                         <p class="message-id" hidden>{{this._id}}</p>
                         <h3 class="message-header"><i class="fa fa-comment" aria-hidden="true"></i> {{this.header}}</h3>
                         <h6 class="message-author">By: {{this.authorName}}</h6>
-                        <p class="message-body">{{this.body}}
-                        {{# if this.imgs}}<br><br>Album:
-                        <div class="album">
-                            {{# each this.imgs}}
-                                <a class="fancybox-thumb" rel="{{../_id}}" href="{{this.publicPath}}" title="{{../body}}"><img src="{{this.publicPath}}" alt="" height="100" width="100" /></a>
-                            {{/each}}
-                        </div>
+                    <p class="message-body">{{this.body}}
+                        {{# if this.imgs}}
+                            <br><br>Album:
+                            <div class="album">
+                                {{# each this.imgs}}
+                                    <a class="fancybox-thumb" rel="{{../_id}}" href="{{this.publicPath}}" title="{{../body}}"><img src="{{this.publicPath}}" alt="" height="100" width="100" /></a>
+                                {{/each}}
+                            </div>
                         {{/if}}
                         </p>
                     </div>
