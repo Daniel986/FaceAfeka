@@ -99,6 +99,8 @@ function previewImages(toShow) {
     //console.log("in the img preview");
     var preview = $('#image-preview').empty();
     var text = $('#preview-text').empty();
+    if(!toShow)
+        $('#image-uploader').val('');
     if ($("#image-uploader")[0].files && toShow) {
         //console.log("file: " + $("#image-uploader")[0].files[0] + "\nFile name: " + $("#image-uploader")[0].files[0].name);
         text.append("Preview: ");
